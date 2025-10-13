@@ -1,0 +1,7 @@
+openai
+python-dotenv
+cycode
+e2b-code-interpreter
+requests
+flask
+pytest

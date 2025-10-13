@@ -1,0 +1,20 @@
+# Environment variables
+
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.env
+TEST_RESULTS.md
+TEST_SEQUENCE.md
+SETUP_GUIDE.md
+SETUP_GITHUB_DEMO.md
+BUILD_PLAN.md
+nvidia-hack
+nvidia-hack/lib
