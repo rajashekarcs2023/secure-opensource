@@ -11,10 +11,6 @@ venv/
 env/
 ENV/
 .env
-TEST_RESULTS.md
-TEST_SEQUENCE.md
-SETUP_GUIDE.md
-SETUP_GITHUB_DEMO.md
-BUILD_PLAN.md
+*.md
 nvidia-hack
 nvidia-hack/lib
