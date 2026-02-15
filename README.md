@@ -1,288 +1,135 @@
-# 🛡️ Security Triage Agent
-### NVIDIA Nemotron Hackathon - Autonomous Security for Open Source
+# Security Triage Agent
 
-**Autonomous security vulnerability detection, analysis, fixing, and validation powered by NVIDIA Nemotron 70B + MCP Servers**
+Autonomous security vulnerability detection, analysis, and remediation agent powered by NVIDIA Nemotron and multi-MCP orchestration.
 
-<div align="center">
-
-[![NVIDIA](https://img.shields.io/badge/NVIDIA-Nemotron%2070B-76B900?style=for-the-badge&logo=nvidia)](https://www.nvidia.com/)
-[![E2B](https://img.shields.io/badge/E2B-Sandboxes-orange?style=for-the-badge)](https://e2b.dev/)
-[![Perplexity](https://img.shields.io/badge/Perplexity-Research-blue?style=for-the-badge)](https://perplexity.ai/)
-
-</div>
-
----
-
-## 🚨 The Problem
-
-- **84%** of open source packages maintained by 1-2 people
-- **73%** of critical vulnerabilities unfixed for 6+ months  
-- **Log4j** cost companies **$10+ BILLION**
-- Maintainers spend **8+ hours** per security issue
-
-## ✨ Our Solution
-
-**From GitHub Issue → Validated Fix → Pull Request in 30 seconds**
-
-Fully autonomous agent that:
-1. ✅ Reads security issues from GitHub
-2. ✅ Analyzes severity with NVIDIA Nemotron  
-3. ✅ Researches CVEs with Perplexity
-4. ✅ Generates secure fixes with NVIDIA Nemotron
-5. ✅ Validates exploits in E2B sandboxes
-6. ✅ Creates ready-to-merge PRs
-
-**Time Saved**: 8 hours → 30 seconds per vulnerability
-
----
-
-## 🏆 Why This Wins
-
-### ✅ Real Problem (Measurable Impact)
-- 500K+ projects using vulnerable dependencies
-- Reduces fix time from 11 hours → 4 minutes
-- Prevents supply chain attacks
-
-### ✅ Complex Agentic Workflow
-- 6-phase autonomous decision making
-- Multi-MCP orchestration
-- Self-validation loop
-
-### ✅ Heavy Nemotron Usage
-- Code analysis & root cause identification
-- Multi-approach fix generation
-- Test case creation
-- Security advisory generation
-
-### ✅ Not Simple Prompting
-- Real vulnerability reproduction in sandboxes
-- Browser-based exploit testing
-- Multi-source RAG synthesis
-- Full code execution & validation
-
----
-
-## 🛠️ Tech Stack
-
-### Core AI
-- **NVIDIA Nemotron Super 49B** - Code analysis, fix generation, reasoning
-- **NVIDIA NIMs** - Optimized inference
-
-### MCP Servers (6 integrated)
-1. **Cycode** - SAST, SCA, Secrets, IaC scanning
-2. **E2B** - Secure code execution sandboxes
-3. **DebuggAI** - Browser-based end-to-end testing
-4. **DeepResearch (Octagon)** - CVE database research
-5. **Exa** - AI-powered search for security patterns
-6. **GitHub API** - Issue reading, PR creation
-
----
-
-## 📋 Project Files
-
-### Documentation
-- **`QUICK_START.md`** ⚡ - 30-minute setup guide **(START HERE)**
-- **`API_KEYS_CHECKLIST.md`** 🔑 - API key setup instructions
-- **`SETUP_GUIDE.md`** 📚 - Comprehensive setup documentation
-- **`project_idea.md`** 💡 - Original concept & demo script
-- **`plan.md`** 📋 - MCP integration strategy
-
-### MCP Server Docs
-- **`cycode.md`** - Cycode CLI & MCP setup
-- **`e2b.md`** - E2B sandbox documentation
-- **`debugai.md`** - DebuggAI MCP setup
-- **`deepresearch.md`** - Octagon Deep Research setup
-
-### Code
-- **`test_nvidia_api.py`** - NVIDIA API test (working ✅)
-- **`test_all_mcps.py`** - Complete MCP test suite
-- **`.env`** - API keys (configured ✅)
-- **`requirements.txt`** - Python dependencies
-
----
-
-## 🚀 Quick Start
-
-### Run the Demo
-
-```bash
-# 1. Clone and setup
-git clone https://github.com/YOUR_USERNAME/nvidia-hack.git
-cd nvidia-hack
-python -m venv nvidia-hack
-source nvidia-hack/bin/activate
-pip install -r requirements.txt
-
-# 2. Set up API keys in .env file
-# See SETUP_GITHUB_DEMO.md for details
-
-# 3. Run the agent on a GitHub issue
-python demo_agent.py 1  # Replace 1 with your issue number
-```
-
-### What Happens:
+## Architecture
 
 ```
-[STEP 1] 📋 Reading Issue #1 from GitHub
-[STEP 2] 📂 Fetching vulnerable code
-[STEP 3] 🧠 NVIDIA NEMOTRON: Analyzing severity
-[STEP 4] 🔍 PERPLEXITY: Researching CVEs
-[STEP 5] 🔧 NVIDIA NEMOTRON: Generating fix
-[STEP 6] ✅ E2B SANDBOX: Validating fix
-[STEP 7] 📝 Creating Pull Request
-
-✅ COMPLETE in 28 seconds
+GitHub PR ──► Pattern Scanner ──► NVIDIA Nemotron (analysis + fix generation)
+                                        │
+                    ┌───────────────────┼───────────────────┐
+                    ▼                   ▼                   ▼
+             Perplexity MCP       Exa MCP            E2B Sandbox
+             (CVE research)    (code examples)    (exploit validation)
+                    │                   │                   │
+                    └───────────────────┼───────────────────┘
+                                        ▼
+                                GitHub MCP ──► Fix PR + Security Review
 ```
+
+The agent runs a 7-phase pipeline:
+
+1. **Scan** — Reads open PRs via GitHub MCP, detects vulnerability patterns (SQL injection, XSS, etc.) using regex-based static analysis
+2. **Research** — Queries Perplexity MCP for recent CVE data and CVSS scores
+3. **Code Search** — Queries Exa MCP for real-world fix patterns from open-source repos
+4. **Analyze** — Sends vulnerability context + research to NVIDIA Nemotron for root-cause analysis and severity assessment
+5. **Fix** — NVIDIA Nemotron generates secure code (e.g., parameterized queries) informed by Exa code examples
+6. **Validate** — Reproduces the exploit and tests the fix in an E2B sandbox
+7. **Remediate** — Creates a fix branch, commits secure code, opens a PR, and posts a security review comment via GitHub MCP
+
+## Tech Stack
+
+| Component | Technology | Role |
+|-----------|-----------|------|
+| Core LLM | NVIDIA Nemotron Nano 9B / 70B | Vulnerability analysis, code generation, severity scoring |
+| Inference | NVIDIA NIMs API | Model serving via `integrate.api.nvidia.com` |
+| PR Management | GitHub MCP | List PRs, read files, create branches, commit code, open PRs, post comments |
+| CVE Research | Perplexity MCP | Real-time CVE lookup and threat intelligence |
+| Code Search | Exa MCP | Semantic search for fix patterns across GitHub |
+| Sandbox | E2B MCP | Isolated code execution for exploit reproduction and fix validation |
+| SAST/SCA | Cycode MCP | Static analysis, secrets detection, IaC scanning |
+| Browser Testing | DebuggAI MCP | End-to-end exploit testing |
+| Dashboard | Streamlit | Real-time scan visualization |
+| Orchestration | Python asyncio + MCP Protocol | Async multi-server coordination |
+
+## Key Files
+
+| File | Description |
+|------|-------------|
+| `auto_pr_scanner.py` | Main agent — auto-scans all open PRs, orchestrates 4 MCP servers |
+| `security_triage_agent.py` | 7-phase triage pipeline (scan → research → analyze → fix → validate) |
+| `demo_agent.py` | Issue-driven demo agent for single-issue workflow |
+| `dashboard_live.py` | Streamlit dashboard with live scan output |
+| `vulnerable_app.py` | Intentionally vulnerable Flask app (SQL injection) for testing |
+| `vulnerable_app_FIXED.py` | Agent-generated secure version |
+| `mcp_orchestrator.py` | MCP server connection manager |
+| `requirements.txt` | Python dependencies |
+
+## Setup
 
 ### Prerequisites
 
 - Python 3.10+
 - Node.js 16+
-- API Keys:
-  - NVIDIA API Key
-  - GitHub Token
-  - E2B API Key
-  - Perplexity API Key
+- Docker (for GitHub MCP server)
 
----
-
-## 🎬 Demo Workflow
-
-```
-Issue Reported → Agent Scans → Vulnerability Found
-       ↓
-Reproduce in Sandbox → Exploit Confirmed
-       ↓
-Nemotron Analyzes → Generates Fix → Creates Tests
-       ↓
-Validates in Sandbox → All Tests Pass
-       ↓
-Creates PR → Security Advisory → CVE Documentation
-       ↓
-COMPLETE: 3-4 minutes (vs 11 hours manually)
-```
-
----
-
-## 📊 Current Status
-
-### ✅ Completed
-- [x] NVIDIA Nemotron API integration
-- [x] Environment setup
-- [x] MCP server documentation
-- [x] Test suite creation
-- [x] API key management
-
-### 🚧 Next Steps (In Priority Order)
-1. **Test all MCPs** - Run `test_all_mcps.py`
-2. **Get remaining API keys** - Follow checklist
-3. **Build vulnerable demo app** - `secure_pay_api.py`
-4. **Create agent orchestrator** - Main workflow engine
-5. **Integrate MCPs** - Connect all services
-6. **Test end-to-end** - Full workflow validation
-7. **Polish output** - Terminal formatting
-8. **Record demo** - Backup video
-
----
-
-## 🎯 Critical Path to Win
-
-### Must Have (Core Demo)
-- ✅ NVIDIA Nemotron (working)
-- ⏳ Cycode scanning
-- ⏳ E2B reproduction
-- ⏳ GitHub PR creation
-- ⏳ Fix generation & validation
-
-### Nice to Have (Extra Points)
-- ⏳ DebuggAI browser testing
-- ⏳ DeepResearch CVE lookup
-- ⏳ Real-time progress bars
-- ⏳ Interactive demo
-
-### Time Budget
-- Setup & Testing: 30 min
-- Build Core Agent: 2 hours
-- Integration & Testing: 1 hour
-- Demo Polish: 1 hour
-- **Total: 4.5 hours**
-
----
-
-## 🏅 Hackathon Scoring
-
-### Impact (35 points)
-- ✅ Solves $10B+ problem
-- ✅ 500K+ projects benefit
-- ✅ Measurable time savings
-
-### Technical Innovation (30 points)
-- ✅ 6-phase agentic workflow
-- ✅ Multi-MCP orchestration
-- ✅ Self-validating system
-
-### Nemotron Integration (25 points)
-- ✅ Advanced code analysis
-- ✅ Multi-approach generation
-- ✅ Complex reasoning chains
-
-### Demo Quality (10 points)
-- ✅ Live vulnerability demo
-- ✅ End-to-end workflow
-- ✅ Interactive elements
-
-**Estimated Score: 85-95/100**
-
----
-
-## 🆘 Support
-
-### If Tests Fail
-1. Check `SETUP_GUIDE.md` troubleshooting section
-2. Verify API keys in `.env`
-3. Check Python version (need 3.10+)
-4. Check Node.js version (need 16+)
-
-### If Time is Short
-- Focus on: NVIDIA + Cycode + E2B + GitHub
-- Mock DebuggAI and DeepResearch if needed
-- Show code diffs instead of live execution
-
----
-
-## 📞 Quick Commands
+### Install
 
 ```bash
-# Test everything
-python3 test_all_mcps.py
-
-# Test just NVIDIA
-python3 test_nvidia_api.py
-
-# Check Cycode
-cycode status
-
-# Install missing packages
-pip3 install -r requirements.txt
-npm install -g @debugg-ai/debugg-ai-mcp octagon-deep-research-mcp
+git clone https://github.com/rajashekarcs2023/secure-opensource.git
+cd secure-opensource
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
----
+### Environment Variables
 
-## 🎤 Pitch (30 seconds)
+Create a `.env` file:
 
-> "Open source powers everything, but 84% of projects have 1-2 maintainers drowning in security issues. Log4j took 2 weeks to fix and cost $10 billion. 
->
-> Our agent uses NVIDIA Nemotron to autonomously triage, reproduce, fix, and validate vulnerabilities in under 4 minutes. Watch it turn a critical SQL injection into a secure, tested pull request while you grab coffee.
->
-> There are 50,000 active security issues right now. This agent can fix them. That's real impact."
+```
+NVIDIA_API_KEY=<your-nvidia-api-key>
+GITHUB_TOKEN=<your-github-pat>
+E2B_API_KEY=<your-e2b-key>
+PERPLEXITY_API_KEY=<your-perplexity-key>
+EXA_API_KEY=<your-exa-key>
+```
 
----
+## Usage
 
-## 🏆 Let's Win This! 
+### Scan all open PRs
 
-**Next Action**: Run `python3 test_all_mcps.py` to verify setup
+```bash
+python auto_pr_scanner.py <repo_owner> <repo_name>
+```
 
----
+### Run on a specific GitHub issue
 
-**Built with ❤️ for the NVIDIA Hackathon**
+```bash
+python demo_agent.py <issue_number>
+```
+
+### Run the triage agent on a local file
+
+```bash
+python security_triage_agent.py vulnerable_app.py
+```
+
+### Launch the dashboard
+
+```bash
+streamlit run dashboard_live.py
+```
+
+## How It Works
+
+**Auto PR Scanner** (`auto_pr_scanner.py`):
+
+1. Connects to 4 MCP servers (GitHub, E2B, Perplexity, Exa) via async stdio transport
+2. Lists all open PRs using GitHub MCP's `list_pull_requests` tool
+3. Skips bot-created fix PRs and previously reviewed PRs
+4. For each PR with Python files, runs regex-based vulnerability detection
+5. Concurrently queries Perplexity (CVE data) and Exa (fix examples)
+6. Feeds all context to NVIDIA Nemotron for assessment and fix generation
+7. Validates the fix in E2B sandbox by running exploit tests
+8. Creates a `security-fix-pr-{N}` branch, commits the fix, opens a new PR, and posts a detailed review comment on the vulnerable PR
+
+**NVIDIA Nemotron is used for**:
+- Vulnerability severity assessment with CVSS scoring
+- Root-cause analysis of detected patterns
+- Context-aware secure code generation (using CVE research + real code examples)
+- Security advisory content generation
+
+## License
+
+MIT

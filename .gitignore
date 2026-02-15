@@ -12,5 +12,6 @@ env/
 ENV/
 .env
 *.md
+!README.md
 nvidia-hack
 nvidia-hack/lib
