@@ -42,18 +42,31 @@ The agent runs a 7-phase pipeline:
 | Dashboard | Streamlit | Real-time scan visualization |
 | Orchestration | Python asyncio + MCP Protocol | Async multi-server coordination |
 
-## Key Files
+## Project Structure
 
-| File | Description |
-|------|-------------|
-| `auto_pr_scanner.py` | Main agent — auto-scans all open PRs, orchestrates 4 MCP servers |
-| `security_triage_agent.py` | 7-phase triage pipeline (scan → research → analyze → fix → validate) |
-| `demo_agent.py` | Issue-driven demo agent for single-issue workflow |
-| `dashboard_live.py` | Streamlit dashboard with live scan output |
-| `vulnerable_app.py` | Intentionally vulnerable Flask app (SQL injection) for testing |
-| `vulnerable_app_FIXED.py` | Agent-generated secure version |
-| `mcp_orchestrator.py` | MCP server connection manager |
-| `requirements.txt` | Python dependencies |
+```
+├── src/                          # Core agent code
+│   ├── auto_pr_scanner.py        # Main agent — auto-scans all open PRs, orchestrates 4 MCP servers
+│   ├── security_triage_agent.py  # 7-phase triage pipeline (scan → research → analyze → fix → validate)
+│   ├── demo_agent.py             # Issue-driven demo agent for single-issue workflow
+│   ├── pr_security_agent.py      # PR-focused security analysis agent
+│   ├── security_agent.py         # Standalone security scanning agent
+│   ├── github_triage_agent.py    # GitHub-integrated triage workflow
+│   ├── full_agent_with_github_mcp.py  # Full pipeline with GitHub MCP
+│   ├── simple_agent.py           # Minimal agent for quick testing
+│   ├── mcp_orchestrator.py       # MCP server connection manager
+│   ├── dashboard.py              # Basic Streamlit dashboard
+│   └── dashboard_live.py         # Live dashboard with real-time scan output
+├── experiments/                   # Tests, exploratory scripts, demo apps
+│   ├── test_*.py                 # MCP and API integration tests
+│   ├── vulnerable_app.py         # Intentionally vulnerable Flask app (SQL injection)
+│   ├── vulnerable_app_FIXED.py   # Agent-generated secure version
+│   ├── app_v1_safe.py            # Safe app baseline
+│   └── setup_cycode.sh           # Cycode CLI setup script
+├── .env                          # API keys (not committed)
+├── requirements.txt              # Python dependencies
+└── README.md
+```
 
 ## Setup
 
@@ -90,30 +103,30 @@ EXA_API_KEY=<your-exa-key>
 ### Scan all open PRs
 
 ```bash
-python auto_pr_scanner.py <repo_owner> <repo_name>
+python src/auto_pr_scanner.py <repo_owner> <repo_name>
 ```
 
 ### Run on a specific GitHub issue
 
 ```bash
-python demo_agent.py <issue_number>
+python src/demo_agent.py <issue_number>
 ```
 
 ### Run the triage agent on a local file
 
 ```bash
-python security_triage_agent.py vulnerable_app.py
+python src/security_triage_agent.py experiments/vulnerable_app.py
 ```
 
 ### Launch the dashboard
 
 ```bash
-streamlit run dashboard_live.py
+streamlit run src/dashboard_live.py
 ```
 
 ## How It Works
 
-**Auto PR Scanner** (`auto_pr_scanner.py`):
+**Auto PR Scanner** (`src/auto_pr_scanner.py`):
 
 1. Connects to 4 MCP servers (GitHub, E2B, Perplexity, Exa) via async stdio transport
 2. Lists all open PRs using GitHub MCP's `list_pull_requests` tool
